@@ -164,6 +164,7 @@ try {
 
     <!-- Main Content -->
     <main class="flex-grow container mx-auto px-4 py-8">
+        <?php $flash = Functions::displayFlashMessage(); if ($flash) { echo '<div class="mb-4">' . $flash . '</div>'; } ?>
         <!-- Welcome Section -->
         <div class="bg-white rounded-xl shadow-md p-6 mb-8">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
