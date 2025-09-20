@@ -39,7 +39,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             case 'add_question':
                 try {
-                    $options = json_encode(explode('\n', trim($_POST['options'])));
+                    // Normalize options: split by any newline (\r\n, \r, or \n), trim, and drop empty lines
+                    $rawOptions = isset($_POST['options']) ? $_POST['options'] : '';
+                    $lines = preg_split("/\r\n|\r|\n/", trim($rawOptions));
+                    $lines = array_values(array_filter(array_map('trim', $lines), function ($v) { return $v !== ''; }));
+                    $options = json_encode($lines);
+                
                     $stmt = $pdo->prepare('INSERT INTO questions (exam_id, question_text, question_type, options, correct_answer, marks) VALUES (?, ?, ?, ?, ?, ?)');
                     $stmt->execute([
                         $_POST['exam_id'],

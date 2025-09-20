@@ -82,7 +82,25 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
             while ($row = $stmt->fetch()) {
                 // Process options for multiple choice questions
                 if ($row['question_type'] === 'multiple_choice' && !empty($row['options'])) {
-                    $row['options'] = json_decode($row['options'], true);
+                    $decoded = json_decode($row['options'], true);
+                    if (is_array($decoded)) {
+                        if (count($decoded) === 1 && is_string($decoded[0]) && preg_match("/\r|\n/", $decoded[0])) {
+                            $lines = preg_split("/\r\n|\r|\n/", $decoded[0]);
+                            $lines = array_values(array_filter(array_map('trim', $lines), function ($v) { return $v !== ''; }));
+                            $row['options'] = $lines;
+                        } else {
+                            $row['options'] = $decoded;
+                        }
+                    } elseif (is_string($decoded)) {
+                        $lines = preg_split("/\r\n|\r|\n/", $decoded);
+                        $lines = array_values(array_filter(array_map('trim', $lines), function ($v) { return $v !== ''; }));
+                        $row['options'] = $lines;
+                    } else {
+                        $text = $row['options'];
+                        $lines = preg_split("/\r\n|\r|\n/", $text);
+                        $lines = array_values(array_filter(array_map('trim', $lines), function ($v) { return $v !== ''; }));
+                        $row['options'] = $lines;
+                    }
                 }
                 
                 $questions[] = $row;

@@ -206,7 +206,28 @@ try {
     // Process options for multiple choice questions
     foreach ($questions as &$question) {
         if ($question['question_type'] === 'multiple_choice' && !empty($question['options'])) {
-            $question['options'] = json_decode($question['options'], true);
+            $decoded = json_decode($question['options'], true);
+            if (is_array($decoded)) {
+                // Handle legacy case: ["opt1\nopt2\r\nopt3"] stored as a single string inside an array
+                if (count($decoded) === 1 && is_string($decoded[0]) && preg_match("/\r|\n/", $decoded[0])) {
+                    $lines = preg_split("/\r\n|\r|\n/", $decoded[0]);
+                    $lines = array_values(array_filter(array_map('trim', $lines), function ($v) { return $v !== ''; }));
+                    $question['options'] = $lines;
+                } else {
+                    $question['options'] = $decoded;
+                }
+            } elseif (is_string($decoded)) {
+                // Rare case: decoded to string
+                $lines = preg_split("/\r\n|\r|\n/", $decoded);
+                $lines = array_values(array_filter(array_map('trim', $lines), function ($v) { return $v !== ''; }));
+                $question['options'] = $lines;
+            } else {
+                // Fallback: treat original value as newline-delimited text
+                $text = $question['options'];
+                $lines = preg_split("/\r\n|\r|\n/", $text);
+                $lines = array_values(array_filter(array_map('trim', $lines), function ($v) { return $v !== ''; }));
+                $question['options'] = $lines;
+            }
         }
     }
 } catch (PDOException $e) {
