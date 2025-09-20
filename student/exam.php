@@ -63,7 +63,15 @@ try {
 }
 
 // Check if exam is active
-$now = new DateTime();
+// Replace PHP time with database server time to avoid timezone mismatches
+try {
+    $stmt = $conn->query("SELECT NOW() AS current_time");
+    $row = $stmt->fetch();
+    $now = new DateTime($row['current_time']);
+} catch (PDOException $e) {
+    error_log("Error fetching server time: " . $e->getMessage());
+    $now = new DateTime(); // fallback to PHP time if DB time fails
+}
 $start_time = new DateTime($exam['start_time']);
 $end_time = new DateTime($exam['end_time']);
 
