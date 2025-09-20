@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <style>
+    .primary { fill: #2563EB; }
+    .secondary { fill: #14B8A6; }
+    .accent { fill: #F59E0B; }
+    .light { fill: #F9FAFB; }
+    .dark { fill: #111827; }
+    .neutral { fill: #6B7280; }
+  </style>
+  
+  <!-- Background -->
+  <rect width="800" height="600" class="light" />
+  
+  <!-- Computer/Monitor -->
+  <rect x="250" y="150" width="300" height="200" rx="10" class="dark" />
+  <rect x="270" y="170" width="260" height="160" class="light" />
+  
+  <!-- Computer Stand -->
+  <rect x="350" y="350" width="100" height="20" class="dark" />
+  <rect x="375" y="370" width="50" height="30" class="dark" />
+  
+  <!-- Screen Content - Exam Interface -->
+  <rect x="290" y="190" width="220" height="120" class="light" />
+  
+  <!-- Question Area -->
+  <rect x="300" y="200" width="200" height="30" class="neutral" opacity="0.2" />
+  
+  <!-- Answer Options -->
+  <rect x="300" y="240" width="200" height="10" class="neutral" opacity="0.1" />
+  <rect x="300" y="260" width="200" height="10" class="neutral" opacity="0.1" />
+  <rect x="300" y="280" width="200" height="10" class="neutral" opacity="0.1" />
+  
+  <!-- Timer Circle -->
+  <circle cx="480" cy="210" r="15" class="primary" opacity="0.8" />
+  
+  <!-- Student Figure -->
+  <circle cx="150" cy="300" r="50" class="secondary" opacity="0.8" />
+  <rect x="125" y="360" width="50" height="100" rx="10" class="secondary" opacity="0.8" />
+  
+  <!-- Graduation Cap -->
+  <rect x="600" y="250" width="80" height="20" class="accent" />
+  <polygon points="640,250 680,250 660,220" class="accent" />
+  <circle cx="640" cy="250" r="5" class="dark" />
+  
+  <!-- Certificate -->
+  <rect x="550" y="300" width="120" height="80" rx="5" class="light" stroke="#14B8A6" stroke-width="3" />
+  <line x1="570" y1="320" x2="650" y2="320" stroke="#6B7280" stroke-width="2" />
+  <line x1="570" y1="340" x2="650" y2="340" stroke="#6B7280" stroke-width="2" />
+  <line x1="570" y1="360" x2="650" y2="360" stroke="#6B7280" stroke-width="2" />
+  
+  <!-- Decorative Elements -->
+  <circle cx="100" cy="100" r="30" class="primary" opacity="0.2" />
+  <circle cx="700" cy="500" r="40" class="secondary" opacity="0.2" />
+  <circle cx="200" cy="500" r="25" class="accent" opacity="0.2" />
+  <circle cx="600" cy="150" r="20" class="primary" opacity="0.2" />
+</svg>

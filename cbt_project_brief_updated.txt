@@ -1,0 +1,197 @@
+
+# Project Brief: Core PHP CBT (Computer-Based Test) Software
+
+## 1. Project Overview
+We want to build a Computer-Based Test (CBT) software in plain Core PHP (no frameworks) to be used in a mentorship school for student exams.
+
+The system should support:
+- Multiple courses and exams
+- Student exam management with time tracking
+- Score recording, transcripts, and CGPA calculation
+- Certificate generation
+- Role-based portals (Student, Admin, Superadmin)
+- Modern, responsive UI using Tailwind CSS + Vanilla JavaScript
+
+---
+
+## 2. System Roles
+1. Student
+   - Register and log in
+   - View available courses and exams
+   - Take timed exams (resume timer if disconnected)
+   - View results and scores per course
+   - Generate transcript (with CGPA)
+   - Download personalized certificates
+   - Manage profile
+
+2. Admin
+   - Manage courses (add/edit/delete)
+   - Manage exams (create/edit, set time, open/close)
+   - Manage student enrollment
+   - Monitor exam activity and scores
+   - Generate reports (CSV/PDF)
+   - Configure exam policies and grading rules
+
+3. Superadmin
+   - Manage admins (add/edit/remove)
+   - Oversee entire system activities
+   - Manage global settings (branding, certificate template, exam policies)
+   - View system activity logs
+
+---
+
+## 3. Functional Requirements
+### Student Features
+- Register/Login with email & password (hashed storage)
+- Dashboard showing active exams, results, and certificates
+- Exam system with:
+  - Timer countdown (persistent if logout/login)
+  - Autosave answers (AJAX/JavaScript)
+  - Submission with automatic grading
+- Results page (per-course scores)
+- Transcript page with CGPA calculation
+- Certificate page (custom certificate generation)
+- Profile management (update details)
+
+### Admin Features
+- Dashboard with summary of exams, students, courses
+- Create/manage courses
+- Create/manage exams with:
+  - Exam start time & end time
+  - Time duration per exam
+  - Open/close exam toggle
+- Manage students (approve, enroll, reset password)
+- Reports: exam scores, student performance, export (CSV/PDF)
+- Configure grading scale (A, B, C, D, F with GPA values)
+
+### Superadmin Features
+- Dashboard overview of entire system
+- Create/manage admins (assign roles)
+- System logs (student activity, exam logs, admin actions)
+- Global settings (branding, certificate design, grading system)
+
+---
+
+## 4. Folder Structure
+
+cbt/
+│
+├── index.php              # Landing page / Home
+├── login.php              # Login page
+├── register.php           # Student registration
+│
+├── core/                  # Core system files (shared utilities)
+│   ├── db.php             # Database connection (PDO)
+│   ├── functions.php      # Common helper functions
+│   ├── auth.php           # Session/auth checks
+│   └── security.php       # CSRF tokens, sanitization
+│
+├── config/                # Configurations
+│   ├── constants.php      # Global constants
+│   └── settings.php       # App-level settings (exam duration, grading scale)
+│
+├── student/               # Student area
+│   ├── dashboard.php
+│   ├── exam.php
+│   ├── submit_exam.php
+│   ├── results.php
+│   ├── transcript.php
+│   ├── certificate.php
+│   └── profile.php
+│
+├── admin/                 # Admin area
+│   ├── dashboard.php
+│   ├── manage_courses.php
+│   ├── manage_exams.php
+│   ├── manage_students.php
+│   ├── reports.php
+│   └── settings.php
+│
+├── superadmin/            # Superadmin area
+│   ├── dashboard.php
+│   ├── manage_admins.php
+│   ├── system_logs.php
+│   └── config.php
+│
+├── assets/                # Static files
+│   ├── css/
+│   │   └── style.css      # Tailwind
+│   ├── js/
+│   │   └── exam.js        # Timer & autosave
+│   └── images/            # Logos, certificate backgrounds
+│
+├── storage/               # Non-public storage
+│   ├── certificates/      # Generated certificates
+│   ├── transcripts/       # Generated transcripts
+│   └── logs/              # Error & audit logs
+│
+└── vendor/                # (Optional) composer packages e.g. dompdf
+
+---
+
+## 5. Technology Stack
+- Backend: Core PHP (no frameworks)
+- Frontend: Tailwind CSS + Vanilla JavaScript
+- Database: MySQL (PDO for secure queries)
+- PDF Generation: Dompdf (for transcript & certificate)
+- Session Handling: PHP Sessions with timeout and CSRF protection
+
+---
+
+## 6. Security Considerations
+- Use password_hash() and password_verify() for user authentication
+- Validate and sanitize all inputs
+- Implement CSRF protection (tokens in forms)
+- Role-based access control (Student/Admin/Superadmin separation)
+- Escape output to prevent XSS
+- Use prepared statements with PDO to prevent SQL injection
+- Store exam session state securely (time left, questions answered)
+
+---
+
+## 7. Example Database Tables
+- users (id, name, email, password_hash, role, created_at)
+- courses (id, course_code, course_name, credit_units)
+- exams (id, course_id, start_time, end_time, duration, status)
+- questions (id, exam_id, question_text, options, correct_answer)
+- student_answers (id, student_id, exam_id, question_id, answer, score)
+- results (id, student_id, course_id, score, grade, gpa)
+- logs (id, user_id, action, timestamp)
+
+---
+
+## 8. UI/UX Design Guidelines
+
+The UI should be clean, modern, and minimalistic with Tailwind CSS. Use a consistent color scheme across the Student, Admin, and Superadmin portals.
+
+### Primary Colors
+- Primary (Brand Blue): #2563EB (Tailwind blue-600)
+- Secondary (Teal): #14B8A6 (Tailwind teal-500)
+- Accent (Amber): #F59E0B (Tailwind amber-500)
+- Neutral (Gray): #6B7280 (Tailwind gray-500)
+- Background (Light): #F9FAFB (Tailwind gray-50)
+- Text (Dark): #111827 (Tailwind gray-900)
+
+### Gradients
+Use gradients for hero sections, buttons, and dashboards.
+- Primary Gradient:
+  - From: #2563EB (blue-600)
+  - To: #14B8A6 (teal-500)
+  - Tailwind: bg-gradient-to-r from-blue-600 to-teal-500
+
+- Secondary Gradient:
+  - From: #14B8A6 (teal-500)
+  - To: #F59E0B (amber-500)
+  - Tailwind: bg-gradient-to-r from-teal-500 to-amber-500
+
+### Components Styling
+- Buttons: Rounded xl, bold font, gradient backgrounds, hover states (hover:opacity-90).
+- Cards/Panels: White background, soft shadow (shadow-md), rounded corners (rounded-xl).
+- Forms: Minimal, with focus states (focus:ring-2 focus:ring-blue-500).
+- Tables: Striped rows (odd:bg-gray-50 even:bg-white), clean borders.
+- Navigation: Sticky top navbar with gradient background.
+
+### Typography
+- Headings: font-bold, use Tailwind sizes (text-2xl, text-3xl).
+- Body text: text-base text-gray-700.
+- Highlighted values (scores, CGPA): text-xl font-semibold text-blue-600.
