@@ -63,24 +63,26 @@ try {
 }
 
 // Check if exam is active
-// Replace PHP time with database server time to avoid timezone mismatches
 try {
-    $stmt = $conn->query("SELECT NOW() AS current_time");
-    $row = $stmt->fetch();
-    $now = new DateTime($row['current_time']);
+    $stmt = $conn->prepare("SELECT 
+        (NOW() < start_time) AS is_before,
+        (NOW() > end_time) AS is_after
+        FROM exams
+        WHERE id = :exam_id");
+    $stmt->bindParam(':exam_id', $exam_id);
+    $stmt->execute();
+    $flags = $stmt->fetch();
+    if ($flags) {
+        if ((int)$flags['is_before'] === 1) {
+            Functions::redirectWithMessage('dashboard.php', 'This exam is not yet available.', 'error');
+        }
+        if ((int)$flags['is_after'] === 1) {
+            Functions::redirectWithMessage('dashboard.php', 'This exam has expired.', 'error');
+        }
+    }
 } catch (PDOException $e) {
-    error_log("Error fetching server time: " . $e->getMessage());
-    $now = new DateTime(); // fallback to PHP time if DB time fails
-}
-$start_time = new DateTime($exam['start_time']);
-$end_time = new DateTime($exam['end_time']);
-
-if ($now < $start_time) {
-    Functions::redirectWithMessage('dashboard.php', 'This exam is not yet available.', 'error');
-}
-
-if ($now > $end_time) {
-    Functions::redirectWithMessage('dashboard.php', 'This exam has expired.', 'error');
+    error_log('Error evaluating exam window: ' . $e->getMessage());
+    Functions::redirectWithMessage('dashboard.php', 'An error occurred. Please try again later.', 'error');
 }
 
 // Check if student is enrolled in the course
