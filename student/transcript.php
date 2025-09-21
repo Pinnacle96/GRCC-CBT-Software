@@ -64,8 +64,20 @@ if ($total_credit_units > 0) {
     $cgpa = round($total_grade_points / $total_credit_units, 2);
 }
 
-// Handle PDF generation
+// ----------------- Check if student has taken all exams -----------------
+$stmt = $conn->prepare("SELECT COUNT(*) FROM courses");
+$stmt->execute();
+$total_courses = $stmt->fetchColumn();
+
+$all_exams_taken = count($results) >= $total_courses;
+
+// ----------------- Handle PDF generation -----------------
 if (isset($_GET['download'])) {
+    if (!$all_exams_taken) {
+        Functions::displayFlashMessage('You must complete all exams before downloading your transcript.', 'error');
+        header('Location: transcript.php');
+        exit;
+    }
     require_once '../core/generate_transcript.php';
     generate_transcript($student, $results, $cgpa);
     exit;
@@ -150,9 +162,16 @@ if (isset($_GET['download'])) {
 
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
             <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Academic Transcript</h1>
-            <a href="?download=1"
-                class="px-4 sm:px-6 py-2 gradient-primary text-white rounded-xl font-bold hover:opacity-90 hover:scale-105 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-                aria-label="Download academic transcript">Download Transcript</a>
+            <?php if ($all_exams_taken): ?>
+                <a href="?download=1"
+                    class="px-4 sm:px-6 py-2 gradient-primary text-white rounded-xl font-bold hover:opacity-90 hover:scale-105 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    aria-label="Download academic transcript">Download Transcript</a>
+            <?php else: ?>
+                <button disabled
+                    class="px-4 sm:px-6 py-2 bg-gray-400 text-white rounded-xl font-bold opacity-70 cursor-not-allowed"
+                    aria-label="Download academic transcript (disabled)">Download Transcript (Complete all exams
+                    first)</button>
+            <?php endif; ?>
         </div>
 
         <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-8">

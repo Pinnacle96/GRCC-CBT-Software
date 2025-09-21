@@ -1,0 +1,19 @@
+{
+    "name": "dell/grcc_cbt",
+    "description": "cbt",
+    "autoload": {
+        "psr-4": {
+            "Dell\\GrccCbt\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Pinnacle96",
+            "email": "binary.rln@gmail.com"
+        }
+    ],
+    "require": {
+        "phpmailer/phpmailer": "^6.10",
+        "dompdf/dompdf": "^3.1"
+    }
+}
