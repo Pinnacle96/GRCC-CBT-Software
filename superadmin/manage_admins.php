@@ -1,4 +1,9 @@
 <?php
+// Ensure session is started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once '../core/auth.php';
 require_once '../core/functions.php';
 require_once '../core/db.php';
@@ -121,134 +126,272 @@ $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Admins - GRCC CBT System</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        blue: {
+                            600: '#2563EB',
+                            700: '#1E40AF'
+                        },
+                        teal: {
+                            500: '#14B8A6'
+                        },
+                        gray: {
+                            50: '#F9FAFB',
+                            500: '#6B7280',
+                            700: '#374151',
+                            900: '#111827'
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-out',
+                        'scale-up': 'scaleUp 0.2s ease-out'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': {
+                                opacity: '0'
+                            },
+                            '100%': {
+                                opacity: '1'
+                            }
+                        },
+                        scaleUp: {
+                            '0%': {
+                                transform: 'scale(1)'
+                            },
+                            '100%': {
+                                transform: 'scale(1.05)'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .gradient-primary { @apply bg-gradient-to-r from-blue-600 to-teal-500; }
+        }
+    </style>
 </head>
-<body class="bg-gray-50">
-    <nav class="bg-gradient-to-r from-blue-600 to-teal-500 p-4 text-white">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold">GRCC CBT Superadmin</h1>
-            <div class="space-x-4">
-                <a href="dashboard.php" class="hover:text-gray-200">Dashboard</a>
-                <a href="system_logs.php" class="hover:text-gray-200">System Logs</a>
-                <a href="config.php" class="hover:text-gray-200">Configuration</a>
-                <a href="../logout.php" class="hover:text-gray-200">Logout</a>
-            </div>
-        </div>
-    </nav>
 
-    <main class="container mx-auto py-8">
+<body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
+    <!-- Include Responsive Navbar -->
+    <?php include '../includes/superadmin_nav.php'; ?>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <!-- Flash Messages -->
         <?php if ($message): ?>
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <div class="mb-6 bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500 text-green-700 p-4 sm:p-6 rounded-r-lg animate-fade-in"
+                role="alert">
                 <span class="block sm:inline"><?php echo htmlspecialchars($message); ?></span>
             </div>
         <?php endif; ?>
 
         <?php if ($error): ?>
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <div class="mb-6 bg-gradient-to-br from-red-50 to-red-100 border-l-4 border-red-500 text-red-700 p-4 sm:p-6 rounded-r-lg animate-fade-in"
+                role="alert">
                 <span class="block sm:inline"><?php echo htmlspecialchars($error); ?></span>
             </div>
         <?php endif; ?>
 
         <!-- Add Admin Form -->
-        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
-            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Add New Admin</h2>
+        <div
+            class="bg-gradient-to-br from-blue-50 to-teal-50 rounded-xl shadow-lg p-4 sm:p-6 mb-8 hover:shadow-xl transition-shadow">
+            <h2 class="text-xl sm:text-2xl font-semibold text-gray-900 mb-4">Add New Admin</h2>
             <form method="POST" class="space-y-4">
                 <input type="hidden" name="action" value="add_admin">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Name</label>
-                        <input type="text" name="name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <label for="name" class="block text-sm sm:text-base font-medium text-gray-700 mb-2">Name</label>
+                        <input type="text" name="name" id="name" required
+                            class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 text-sm sm:text-base py-2 sm:py-3"
+                            aria-label="Admin name">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Email</label>
-                        <input type="email" name="email" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <label for="email"
+                            class="block text-sm sm:text-base font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" name="email" id="email" required
+                            class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 text-sm sm:text-base py-2 sm:py-3"
+                            aria-label="Admin email">
                     </div>
                 </div>
                 <div class="flex justify-end">
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Add Admin</button>
+                    <button type="submit"
+                        class="px-4 sm:px-6 py-2 gradient-primary text-white rounded-xl font-bold hover:opacity-90 hover:scale-105 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        aria-label="Add admin">Add Admin</button>
                 </div>
             </form>
         </div>
 
         <!-- Admins List -->
-        <div class="bg-white rounded-xl shadow-md p-6">
-            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Existing Admins</h2>
-            <div class="overflow-x-auto">
+        <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-shadow">
+            <h2 class="text-xl sm:text-2xl font-semibold text-gray-900 mb-4">Existing Admins</h2>
+            <!-- Desktop Table View -->
+            <div class="hidden sm:block overflow-x-auto">
                 <table class="w-full">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Activities</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Active</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            <th
+                                class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-medium text-gray-700 uppercase tracking-wider">
+                                Name</th>
+                            <th
+                                class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-medium text-gray-700 uppercase tracking-wider">
+                                Email</th>
+                            <th
+                                class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-medium text-gray-700 uppercase tracking-wider">
+                                Status</th>
+                            <th
+                                class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-medium text-gray-700 uppercase tracking-wider">
+                                Activities</th>
+                            <th
+                                class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-medium text-gray-700 uppercase tracking-wider">
+                                Last Active</th>
+                            <th
+                                class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-medium text-gray-700 uppercase tracking-wider">
+                                Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
                         <?php foreach ($admins as $admin): ?>
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap"><?php echo htmlspecialchars($admin['name']); ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap"><?php echo htmlspecialchars($admin['email']); ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                    <?php echo $admin['status'] === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
-                                    <?php echo ucfirst($admin['status']); ?>
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap"><?php echo $admin['activity_count']; ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-gray-500">
-                                <?php echo $admin['last_activity'] ? date('Y-m-d H:i', strtotime($admin['last_activity'])) : 'Never'; ?>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap space-x-2">
-                                <button onclick="showStatusModal(<?php echo $admin['id']; ?>, '<?php echo $admin['status']; ?>')" 
-                                        class="text-blue-600 hover:text-blue-900">Update Status</button>
-                                <form method="POST" class="inline" onsubmit="return confirm('Are you sure you want to reset the password?');">
-                                    <input type="hidden" name="action" value="reset_password">
-                                    <input type="hidden" name="admin_id" value="<?php echo $admin['id']; ?>">
-                                    <button type="submit" class="text-yellow-600 hover:text-yellow-900">Reset Password</button>
-                                </form>
-                                <form method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this admin?');">
-                                    <input type="hidden" name="action" value="delete_admin">
-                                    <input type="hidden" name="admin_id" value="<?php echo $admin['id']; ?>">
-                                    <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="px-4 sm:px-6 py-4 text-sm text-gray-700">
+                                    <?php echo htmlspecialchars($admin['name']); ?></td>
+                                <td class="px-4 sm:px-6 py-4 text-sm text-gray-700">
+                                    <?php echo htmlspecialchars($admin['email']); ?></td>
+                                <td class="px-4 sm:px-6 py-4">
+                                    <span
+                                        class="px-2 inline-flex text-xs sm:text-sm leading-5 font-semibold rounded-full <?php echo $admin['status'] === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
+                                        <?php echo ucfirst($admin['status']); ?>
+                                    </span>
+                                </td>
+                                <td class="px-4 sm:px-6 py-4 text-sm text-gray-700"><?php echo $admin['activity_count']; ?>
+                                </td>
+                                <td class="px-4 sm:px-6 py-4 text-sm text-gray-700">
+                                    <?php echo $admin['last_activity'] ? date('Y-m-d H:i', strtotime($admin['last_activity'])) : 'Never'; ?>
+                                </td>
+                                <td class="px-4 sm:px-6 py-4 space-x-2">
+                                    <button
+                                        onclick="showStatusModal(<?php echo $admin['id']; ?>, '<?php echo $admin['status']; ?>')"
+                                        class="text-blue-600 hover:text-blue-900 hover:scale-105 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        aria-label="Update status for admin <?php echo htmlspecialchars($admin['name']); ?>">Update
+                                        Status</button>
+                                    <form method="POST" class="inline"
+                                        onsubmit="return confirm('Are you sure you want to reset the password for <?php echo htmlspecialchars($admin['name']); ?>?');">
+                                        <input type="hidden" name="action" value="reset_password">
+                                        <input type="hidden" name="admin_id" value="<?php echo $admin['id']; ?>">
+                                        <button type="submit"
+                                            class="text-yellow-600 hover:text-yellow-900 hover:scale-105 transition focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                            aria-label="Reset password for admin <?php echo htmlspecialchars($admin['name']); ?>">Reset
+                                            Password</button>
+                                    </form>
+                                    <form method="POST" class="inline"
+                                        onsubmit="return confirm('Are you sure you want to delete admin <?php echo htmlspecialchars($admin['name']); ?>?');">
+                                        <input type="hidden" name="action" value="delete_admin">
+                                        <input type="hidden" name="admin_id" value="<?php echo $admin['id']; ?>">
+                                        <button type="submit"
+                                            class="text-red-600 hover:text-red-900 hover:scale-105 transition focus:outline-none focus:ring-2 focus:ring-red-500"
+                                            aria-label="Delete admin <?php echo htmlspecialchars($admin['name']); ?>">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+            </div>
+            <!-- Mobile Card View -->
+            <div class="sm:hidden space-y-4">
+                <?php foreach ($admins as $admin): ?>
+                    <div class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                        <p class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($admin['name']); ?></p>
+                        <p class="text-sm text-gray-700 mt-1"><span class="font-medium">Email:</span>
+                            <?php echo htmlspecialchars($admin['email']); ?></p>
+                        <p class="text-sm text-gray-700 mt-1"><span class="font-medium">Status:</span>
+                            <span
+                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <?php echo $admin['status'] === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
+                                <?php echo ucfirst($admin['status']); ?>
+                            </span>
+                        </p>
+                        <p class="text-sm text-gray-700 mt-1"><span class="font-medium">Activities:</span>
+                            <?php echo $admin['activity_count']; ?></p>
+                        <p class="text-sm text-gray-700 mt-1"><span class="font-medium">Last Active:</span>
+                            <?php echo $admin['last_activity'] ? date('Y-m-d H:i', strtotime($admin['last_activity'])) : 'Never'; ?>
+                        </p>
+                        <div class="mt-2 space-x-2">
+                            <button
+                                onclick="showStatusModal(<?php echo $admin['id']; ?>, '<?php echo $admin['status']; ?>')"
+                                class="text-blue-600 hover:text-blue-900 hover:scale-105 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                aria-label="Update status for admin <?php echo htmlspecialchars($admin['name']); ?>">Update
+                                Status</button>
+                            <form method="POST" class="inline"
+                                onsubmit="return confirm('Are you sure you want to reset the password for <?php echo htmlspecialchars($admin['name']); ?>?');">
+                                <input type="hidden" name="action" value="reset_password">
+                                <input type="hidden" name="admin_id" value="<?php echo $admin['id']; ?>">
+                                <button type="submit"
+                                    class="text-yellow-600 hover:text-yellow-900 hover:scale-105 transition focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                    aria-label="Reset password for admin <?php echo htmlspecialchars($admin['name']); ?>">Reset
+                                    Password</button>
+                            </form>
+                            <form method="POST" class="inline"
+                                onsubmit="return confirm('Are you sure you want to delete admin <?php echo htmlspecialchars($admin['name']); ?>?');">
+                                <input type="hidden" name="action" value="delete_admin">
+                                <input type="hidden" name="admin_id" value="<?php echo $admin['id']; ?>">
+                                <button type="submit"
+                                    class="text-red-600 hover:text-red-900 hover:scale-105 transition focus:outline-none focus:ring-2 focus:ring-red-500"
+                                    aria-label="Delete admin <?php echo htmlspecialchars($admin['name']); ?>">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
             </div>
         </div>
     </main>
 
     <!-- Update Status Modal -->
-    <div id="statusModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Update Admin Status</h3>
-            <form method="POST" id="statusForm">
+    <div id="statusModal"
+        class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
+        <div class="relative p-4 sm:p-5 border w-full sm:w-96 shadow-lg rounded-xl bg-gradient-to-br from-blue-50 to-teal-50 animate-fade-in"
+            role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <h3 id="modal-title" class="text-lg sm:text-xl font-medium text-gray-900 mb-4">Update Admin Status</h3>
+            <form method="POST" id="statusForm" class="space-y-4">
                 <input type="hidden" name="action" value="update_status">
                 <input type="hidden" name="admin_id" id="status_admin_id">
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Status</label>
-                        <select name="status" id="status_select" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                        </select>
-                    </div>
+                <div>
+                    <label for="status_select"
+                        class="block text-sm sm:text-base font-medium text-gray-700 mb-2">Status</label>
+                    <select name="status" id="status_select" required
+                        class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 text-sm sm:text-base py-2 sm:py-3"
+                        aria-label="Admin status">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
                 </div>
-                <div class="mt-4 flex justify-end space-x-3">
-                    <button type="button" onclick="closeStatusModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">Cancel</button>
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Update Status</button>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeStatusModal()"
+                        class="px-4 sm:px-6 py-2 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300 hover:scale-105 transition focus:outline-none focus:ring-2 focus:ring-gray-500"
+                        aria-label="Cancel">Cancel</button>
+                    <button type="submit"
+                        class="px-4 sm:px-6 py-2 gradient-primary text-white rounded-xl font-bold hover:opacity-90 hover:scale-105 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        aria-label="Update admin status">Update Status</button>
                 </div>
             </form>
         </div>
     </div>
+
+    <footer class="gradient-primary text-white py-4 px-4 sm:px-6 lg:px-8">
+        <div class="container mx-auto text-center">
+            <p>© <?php echo date('Y'); ?> GRCC CBT System. All Rights Reserved.</p>
+        </div>
+    </footer>
 
     <script>
         function showStatusModal(adminId, currentStatus) {
@@ -260,6 +403,14 @@ $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
         function closeStatusModal() {
             document.getElementById('statusModal').classList.add('hidden');
         }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && !document.getElementById('statusModal').classList.contains('hidden')) {
+                closeStatusModal();
+            }
+        });
     </script>
 </body>
+
 </html>

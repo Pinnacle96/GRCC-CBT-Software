@@ -1,0 +1,7 @@
+[2025-09-21 05:47:50] [EMAIL] Failed to send email to noahabayomi14@gmail.com: PHPMailer class not found
+[2025-09-21 05:49:05] [INFO] Autoloader loaded from: C:\wamp64\www\grcc_cbt/vendor/autoload.php (PHP 8.1.31)
+[2025-09-21 05:49:27] [INFO] Autoloader loaded from: C:\wamp64\www\grcc_cbt/vendor/autoload.php (PHP 8.1.31)
+[2025-09-21 05:49:27] [EMAIL] Attempting to send email to info.thevoltagenetwork@gmail.com using PHPMailer (Host: smtp.gmail.com, Port: 587)
+[2025-09-21 05:49:27] [EMAIL] Failed to send email to info.thevoltagenetwork@gmail.com: PHPMailer class not found
+[2025-09-21 05:49:27] [EMAIL] Attempting to send email to info.thevoltagenetwork@gmail.com using mail()
+[2025-09-21 05:49:27] [EMAIL] Failed to send email to info.thevoltagenetwork@gmail.com: mail() function failed

@@ -9,17 +9,22 @@ require_once '../core/db.php';
 require_once '../core/functions.php';
 require_once '../config/constants.php';
 
-Auth::requireRole(ROLE_STUDENT);
+// Ensure only superadmin users can access this page
+if (!Auth::isSuperAdmin()) {
+    $error = 'Access denied. Superadmin role required.';
+    header('Location: ../login.php');
+    exit();
+}
 
 // Get user data
-$user_name = $_SESSION['user_name'] ?? 'Student';
+$user_name = $_SESSION['user_name'] ?? 'Admin';
 
 // Get database connection
 $pdo = getDB();
 
-// Get student details
-$student_id = $_SESSION['user_id'];
-$student = Functions::getUserById($pdo, $student_id);
+// Get user details
+$user_id = $_SESSION['user_id'];
+$user = Functions::getUserById($pdo, $user_id);
 
 $message = '';
 $error = '';
@@ -45,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Check if email is already taken by another user
         $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ? AND id != ?");
-        $stmt->execute([$email, $student_id]);
+        $stmt->execute([$email, $user_id]);
         if ($stmt->fetch()) {
             throw new Exception('Email is already taken by another user.');
         }
@@ -55,12 +60,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Update basic info
         $stmt = $pdo->prepare("UPDATE users SET name = ?, email = ? WHERE id = ?");
-        $stmt->execute([$name, $email, $student_id]);
+        $stmt->execute([$name, $email, $user_id]);
 
         // Handle password update if provided
         if (!empty($current_password)) {
             // Verify current password
-            if (!password_verify($current_password, $student['password_hash'])) {
+            if (!password_verify($current_password, $user['password_hash'])) {
                 throw new Exception('Current password is incorrect.');
             }
 
@@ -80,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Update password
             $password_hash = password_hash($new_password, PASSWORD_DEFAULT);
             $stmt = $pdo->prepare("UPDATE users SET password_hash = ? WHERE id = ?");
-            $stmt->execute([$password_hash, $student_id]);
+            $stmt->execute([$password_hash, $user_id]);
         }
 
         // Commit transaction
@@ -88,12 +93,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Log the action
         $log_stmt = $pdo->prepare("INSERT INTO logs (user_id, action, ip_address) VALUES (?, ?, ?)");
-        $log_stmt->execute([$student_id, 'Updated profile', $_SERVER['REMOTE_ADDR']]);
+        $log_stmt->execute([$user_id, 'Updated profile', $_SERVER['REMOTE_ADDR']]);
 
         $message = 'Profile updated successfully.';
 
-        // Refresh student data
-        $student = Functions::getUserById($pdo, $student_id);
+        // Refresh user data
+        $user = Functions::getUserById($pdo, $user_id);
     } catch (Exception $e) {
         $pdo->rollBack();
         $error = $e->getMessage();
@@ -166,7 +171,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
     <!-- Include Responsive Navbar -->
-    <?php include __DIR__ . '/../includes/student_nav.php'; ?>
+    <?php include __DIR__ . '/../includes/superadmin_nav.php'; ?>
 
     <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <!-- Flash Messages -->
@@ -189,7 +194,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <form method="POST" class="space-y-6">
                 <div>
                     <label for="name" class="block text-sm sm:text-base font-medium text-gray-700">Full Name</label>
-                    <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($student['name']); ?>"
+                    <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($user['name']); ?>"
                         class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 text-sm sm:text-base py-2 sm:py-3"
                         aria-label="Full name" required>
                 </div>
@@ -197,8 +202,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div>
                     <label for="email" class="block text-sm sm:text-base font-medium text-gray-700">Email
                         Address</label>
-                    <input type="email" id="email" name="email"
-                        value="<?php echo htmlspecialchars($student['email']); ?>"
+                    <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>"
                         class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 text-sm sm:text-base py-2 sm:py-3"
                         aria-label="Email address" required>
                 </div>

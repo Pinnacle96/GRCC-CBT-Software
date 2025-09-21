@@ -1,0 +1,9 @@
+[2025-09-20 19:48:43] [info] Student ID: 2, Exam ID: 1, Message: Exam submitted successfully. Score: 50/50, Grade: A, GPA: 5
+[2025-09-21 00:32:09] [info] Student ID: 2, Exam ID: 1, Message: Exam submitted successfully. Score: 50/50, Grade: A, GPA: 5
+[2025-09-21 04:17:21] [info] Student ID: 2, Exam ID: 2, Message: Exam submitted successfully. Score: 100/100, Grade: A, GPA: 5
+[2025-09-21 04:41:11] [info] Student ID: 2, Exam ID: 2, Message: Exam submitted successfully. Score: 15/100, Grade: F, GPA: 0
+[2025-09-21 04:43:51] [info] Student ID: 2, Exam ID: 1, Message: Exam submitted successfully. Score: 50/50, Grade: A, GPA: 5
+[2025-09-21 04:46:13] [info] Student ID: 2, Exam ID: 1, Message: Exam submitted successfully. Score: 50/50, Grade: A, GPA: 5
+[2025-09-21 04:46:55] [info] Student ID: 2, Exam ID: 2, Message: Exam submitted successfully. Score: 65/100, Grade: B, GPA: 4
+[2025-09-21 04:59:40] [info] Student ID: 2, Exam ID: 1, Message: Exam submitted successfully. Score: 50/50, Grade: A, GPA: 5
+[2025-09-21 05:00:02] [info] Student ID: 2, Exam ID: 2, Message: Exam submitted successfully. Score: 100/100, Grade: A, GPA: 5

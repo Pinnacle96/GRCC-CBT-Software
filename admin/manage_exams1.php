@@ -45,18 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $lines = array_values(array_filter(array_map('trim', $lines), function ($v) {
                         return $v !== '';
                     }));
-                    if ($_POST['question_type'] === 'multiple_choice') {
-                        if (count($lines) < 2) {
-                            throw new Exception('Multiple-choice questions require at least two non-empty options.');
-                        }
-                        // Validate correct_answer for MCQs
-                        if (!in_array($_POST['correct_answer'], $lines)) {
-                            throw new Exception('Correct answer must match one of the provided options.');
-                        }
-                    } elseif ($_POST['question_type'] === 'true_false') {
-                        if (!in_array(strtolower($_POST['correct_answer']), ['true', 'false'])) {
-                            throw new Exception('Correct answer for true/false questions must be "true" or "false".');
-                        }
+                    if ($_POST['question_type'] === 'multiple_choice' && count($lines) < 2) {
+                        throw new Exception('Multiple-choice questions require at least two non-empty options.');
                     }
                     $options = json_encode($lines);
 
@@ -83,18 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $lines = array_values(array_filter(array_map('trim', $lines), function ($v) {
                         return $v !== '';
                     }));
-                    if ($_POST['question_type'] === 'multiple_choice') {
-                        if (count($lines) < 2) {
-                            throw new Exception('Multiple-choice questions require at least two non-empty options.');
-                        }
-                        // Validate correct_answer for MCQs
-                        if (!in_array($_POST['correct_answer'], $lines)) {
-                            throw new Exception('Correct answer must match one of the provided options.');
-                        }
-                    } elseif ($_POST['question_type'] === 'true_false') {
-                        if (!in_array(strtolower($_POST['correct_answer']), ['true', 'false'])) {
-                            throw new Exception('Correct answer for true/false questions must be "true" or "false".');
-                        }
+                    if ($_POST['question_type'] === 'multiple_choice' && count($lines) < 2) {
+                        throw new Exception('Multiple-choice questions require at least two non-empty options.');
                     }
                     $options = json_encode($lines);
 
@@ -142,24 +122,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } catch (PDOException $e) {
                     error_log('Error updating exam: ' . $e->getMessage());
                     $error = 'Error updating exam: ' . $e->getMessage();
-                }
-                break;
-
-            case 'delete_question':
-                try {
-                    $pdo->beginTransaction();
-                    // Delete student answers for the question
-                    $stmt = $pdo->prepare('DELETE FROM student_answers WHERE question_id = ?');
-                    $stmt->execute([$_POST['question_id']]);
-                    // Delete the question
-                    $stmt = $pdo->prepare('DELETE FROM questions WHERE id = ?');
-                    $stmt->execute([$_POST['question_id']]);
-                    $pdo->commit();
-                    $message = 'Question deleted successfully';
-                } catch (PDOException $e) {
-                    $pdo->rollBack();
-                    error_log('Error deleting question: ' . $e->getMessage());
-                    $error = 'Error deleting question: ' . $e->getMessage();
                 }
                 break;
         }
@@ -275,7 +237,7 @@ try {
                     </div>
                     <div class="sm:col-span-2">
                         <label class="block text-sm font-medium text-gray-700">Description</label>
-                        <textarea name="description" rows="3" placeholder="Enter exam description here"
+                        <textarea name="description" rows="3"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"></textarea>
                     </div>
                 </div>
@@ -652,20 +614,10 @@ try {
         function validateQuestionForm(form) {
             const questionType = form.querySelector('select[name="question_type"]').value;
             const options = form.querySelector('textarea[name="options"]').value.trim();
-            const correctAnswer = form.querySelector('input[name="correct_answer"]').value.trim();
             if (questionType === 'multiple_choice') {
                 const lines = options.split('\n').map(line => line.trim()).filter(line => line !== '');
                 if (lines.length < 2) {
                     alert('Multiple-choice questions require at least two non-empty options, one per line.');
-                    return false;
-                }
-                if (!lines.includes(correctAnswer)) {
-                    alert('Correct answer must match one of the provided options.');
-                    return false;
-                }
-            } else if (questionType === 'true_false') {
-                if (!['true', 'false'].includes(correctAnswer.toLowerCase())) {
-                    alert('Correct answer for true/false questions must be "true" or "false".');
                     return false;
                 }
             }
@@ -696,13 +648,8 @@ try {
                             <td class="px-3 sm:px-6 py-4 text-sm sm:text-base">${q.question_text || ''}</td>
                             <td class="px-3 sm:px-6 py-4 text-sm sm:text-base">${q.question_type ? q.question_type.replace('_', ' ').toUpperCase() : ''}</td>
                             <td class="px-3 sm:px-6 py-4 text-sm sm:text-base">${q.marks || ''}</td>
-                            <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm sm:text-base space-x-2">
+                            <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm sm:text-base">
                                 <button onclick='editQuestion(${JSON.stringify(q)})' class="text-green-600 hover:text-green-900">Edit</button>
-                                <form method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this question?');">
-                                    <input type="hidden" name="action" value="delete_question">
-                                    <input type="hidden" name="question_id" value="${q.id}">
-                                    <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
-                                </form>
                             </td>
                         `;
                         tbody.appendChild(row);

@@ -4,12 +4,17 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 ?>
+<style>
+    .gradient-primary {
+        background: linear-gradient(to right, #2563EB, #14B8A6);
+    }
+</style>
 
-<header class="gradient-primary text-white shadow-md sticky top-0 z-50" aria-label="Main navigation">
+<header class="gradient-primary text-white shadow-md sticky top-0 z-50" aria-label="GRCC CBT Admin navigation">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         <!-- Logo -->
         <div class="flex items-center">
-            <a href="dashboard.php" class="text-xl sm:text-2xl font-bold"><?php echo htmlspecialchars(APP_NAME); ?></a>
+            <a href="dashboard.php" class="text-xl sm:text-2xl font-bold">GRCC CBT Admin</a>
         </div>
 
         <!-- Hamburger Toggle for Mobile -->
@@ -25,27 +30,24 @@ if (session_status() === PHP_SESSION_NONE) {
             class="hidden md:flex absolute md:static top-full left-0 right-0 bg-blue-600 md:bg-transparent flex-col md:flex-row md:items-center md:space-x-6 p-4 md:p-0 shadow-md md:shadow-none transition-all duration-300"
             role="navigation">
             <ul class="flex flex-col md:flex-row md:space-x-4 items-center" role="menu">
-                <li><a href="dashboard.php"
-                        class="block px-3 py-2 rounded-lg bg-white/20 text-white font-bold hover:bg-white/30 transition focus:outline-none focus:ring-2 focus:ring-white"
-                        role="menuitem">Dashboard</a></li>
-                <li><a href="results.php"
+                <li><a href="manage_courses.php"
                         class="block px-3 py-2 rounded-lg text-white font-bold hover:bg-white/20 transition focus:outline-none focus:ring-2 focus:ring-white"
-                        role="menuitem">Results</a></li>
-                <li><a href="transcript.php"
+                        role="menuitem">Courses</a></li>
+                <li><a href="manage_exams.php"
                         class="block px-3 py-2 rounded-lg text-white font-bold hover:bg-white/20 transition focus:outline-none focus:ring-2 focus:ring-white"
-                        role="menuitem">Transcript</a></li>
-                <li><a href="certificate.php"
+                        role="menuitem">Exams</a></li>
+                <li><a href="manage_students.php"
                         class="block px-3 py-2 rounded-lg text-white font-bold hover:bg-white/20 transition focus:outline-none focus:ring-2 focus:ring-white"
-                        role="menuitem">Certificates</a></li>
-                <li><a href="profile.php"
+                        role="menuitem">Students</a></li>
+                <li><a href="reports.php"
                         class="block px-3 py-2 rounded-lg text-white font-bold hover:bg-white/20 transition focus:outline-none focus:ring-2 focus:ring-white"
-                        role="menuitem">Profile</a></li>
+                        role="menuitem">Reports</a></li>
                 <li>
                     <div class="relative">
                         <button id="dropdown-toggle"
                             class="flex items-center px-3 py-2 rounded-lg text-white font-bold hover:bg-white/20 transition focus:outline-none focus:ring-2 focus:ring-white"
                             aria-haspopup="true" aria-expanded="false">
-                            <span><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Student'); ?></span>
+                            <span><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Admin'); ?></span>
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20"
                                 fill="currentColor">
                                 <path fill-rule="evenodd"

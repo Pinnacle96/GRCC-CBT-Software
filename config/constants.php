@@ -1,13 +1,23 @@
 <?php
+
+
+/**
+ * Application Constants
+ */
+
+// Define BASE_URL for use throughout the application
+if (!defined('BASE_URL')) {
+    define('BASE_URL', 'http://localhost/grcc_cbt'); // Change to your actual base URL
+}
 /**
  * Global Constants
  * Defines constants used throughout the application
  */
 
 // Application information
-define('APP_NAME', 'GRCC CBT System');
+define('APP_NAME', 'SOD GRCC CBT');
 define('APP_VERSION', '1.0.0');
-define('APP_URL', '/grcc_cbt');
+//define('APP_URL', 'http://localhost/grcc_cbt');
 
 // File paths
 define('ROOT_PATH', dirname(__DIR__));
